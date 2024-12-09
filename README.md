@@ -16,6 +16,15 @@ Using Ollama to generate the commit message.
 export AC_OLLAMA_URL='http://your.ollama.server.url'
 export AC_OLLAMA_MODEL='your.ollama.model.name'
 ```
+
+Add to bashrc is recommended.
+
+```
+echo 'export AC_OLLAMA_URL=http://your.ollama.server.url' >> ~/.bashrc
+source ~/.bashrc
+```
+
+> In macos, it maybe .bash_profile or .zshrc, depend on your terminal.
  
 ## Usage
 
