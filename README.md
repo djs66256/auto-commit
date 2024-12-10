@@ -31,3 +31,9 @@ source ~/.bashrc
 ```bash
 python commit.py -a -m "Your additional commit message"
 ```
+
+If you don't like the message, you can re-generate by:
+
+```bash
+python commit.py -a --amend
+```
