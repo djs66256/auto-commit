@@ -16,6 +16,11 @@ def get_git_diff_staged():
     result = subprocess.run(['git', 'diff', '--staged'], capture_output=True, text=True)
     return result.returncode, result.stdout
 
+def get_git_last_diff():
+    # 获取 git diff HEAD HEAD~1 输出
+    result = subprocess.run(['git', 'diff', 'HEAD', 'HEAD~1'], capture_output=True, text=True)
+    return result.returncode, result.stdout
+
 def git_add_all():
     result = subprocess.run(['git', 'add', '.'], capture_output=True, text=True)
     return result.returncode, result.stdout
@@ -69,6 +74,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AI assistant for git commit")
     parser.add_argument("-m", "--message", required=False, help="The commit message")
     parser.add_argument("-a", "--add", action="store_true", help="Add all files to git")
+    parser.add_argument("--amend", action="store_true", help="Amend the last commit")
     parser.add_argument("-v", "--verbose", action="store_true", help="Log level, default is INFO")
     args = parser.parse_args()
 
@@ -76,7 +82,7 @@ if __name__ == "__main__":
     AC_OLLAMA_MODEL = os.getenv("AC_OLLAMA_MODEL", "qwen2.5-coder:7b")
 
     if args.verbose:
-        default_log_level = LogLevel.VERBOSE
+        default_log_level = LogLevel.DEBUG
     else:
         default_log_level = LogLevel.INFO
 
@@ -96,11 +102,13 @@ if __name__ == "__main__":
     if return_code != 0:
         log("Failed to get git status", LogLevel.ERROR)
         sys.exit(1)
-    if files is None or len(files) == 0:
-        log("No files to commit, we will exit now...", LogLevel.INFO)
-        sys.exit(0)
-    else:
-        log(f"We will commit the following files: \n{files}", LogLevel.INFO)
+    
+    if not args.amend:
+        if files is None or len(files) == 0:
+            log("No files to commit, we will exit now...", LogLevel.INFO)
+            sys.exit(0)
+      
+    log(f"We will commit the following files: \n{files}", LogLevel.INFO)
     
     log("Now we will generate the diff messages...", LogLevel.INFO)
     return_code, diff_message = get_git_diff_staged()
@@ -110,13 +118,24 @@ if __name__ == "__main__":
     log(f"Diff message: {diff_message}", LogLevel.VERBOSE)
     log("Done!\n", LogLevel.INFO)
 
+    last_diff_message = ""
+    if args.amend:
+        log("Now we will amend the last commit...", LogLevel.INFO)
+        return_code, last_diff_message = get_git_last_diff()
+        if return_code != 0:
+            log("Failed to amend the last commit", LogLevel.ERROR)
+            sys.exit(1)
+        else:
+            log(f"Last diff message: {last_diff_message}", LogLevel.DEBUG)
+
     user_content = f'''
     User message:
     {message or ""}
     Files:
     {files}
     Diff:
-    {diff_message if len(diff_message) < 10000 else ""}
+    {diff_message or ""}
+    {last_diff_message or ""}
     '''
 
     # use ollama to generate the commit message
