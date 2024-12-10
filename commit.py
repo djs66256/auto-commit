@@ -18,7 +18,7 @@ def get_git_diff_staged():
 
 def get_git_last_diff():
     # 获取 git diff HEAD HEAD~1 输出
-    result = subprocess.run(['git', 'diff', 'HEAD', 'HEAD~1'], capture_output=True, text=True)
+    result = subprocess.run(['git', 'diff', 'HEAD~1', 'HEAD'], capture_output=True, text=True)
     return result.returncode, result.stdout
 
 def git_add_all():
@@ -41,7 +41,7 @@ def system_prompt():
     ## Requirements
     提交日志应该满足以下要求：
     - 简洁明了，不要冗余，描述清楚功能修改及其目的，字数控制在 50 字以内
-    - 使用中文
+    - 始终使用中文
     - 使用现在时
     - 使用祈使语气
     - 使用特定的 commit 类型开头，保持提交信息头部简洁，不要带上任何文件名等其他信息
@@ -58,7 +58,39 @@ def system_prompt():
     docs: {{更新了某个文档}}
     ```
 
-    - Locale: zh-cn
+    ## Locale
+    - zh-cn
+    """
+    return prompt
+
+
+def regenerate_system_prompt():
+    prompt = f"""
+    ## Role
+    你是一位 Git 提交日志助手，你需要根据用户输入的修改信息总结归纳生成一个简洁明了的提交日志，字数控制在 50 字以内。
+
+    ## Requirements
+    提交日志应该满足以下要求：
+    - 简洁明了，不要冗余，描述清楚功能修改及其目的
+    - 始终使用中文
+    - 使用现在时
+    - 使用祈使语气
+    - 使用特定的 commit 类型开头，保持提交信息头部简洁，不要带上任何文件名等其他信息
+        - 使用 `feat:` 开头表示功能修改，大部分情况应该使用这个类型，除非明确的下面几种类型
+        - 使用 `fix:` 开头表示 bug 等问题修复
+        - 使用 `optimize:` 开头表示性能优化
+        - 使用 `docs:` 开头表示文档相关
+
+    ## Example
+    ```
+    feat: {{添加了某个功能}}
+    fix: {{修复了某个 bug}}
+    optimize: {{优化了某个性能}}
+    docs: {{更新了某个文档}}
+    ```
+
+    ## Locale
+    - zh-cn
     """
     return prompt
 
@@ -152,6 +184,23 @@ if __name__ == "__main__":
     response_json = response.json()
     response_message = response_json["message"]["content"]
     response_message = response_message.replace("```", "")
+
+    # If message is too long, re-generate it and make it shorter.
+    if len(response_message) > 200:
+        log(f"Response message: {response_message}", LogLevel.VERBOSE)
+        log("Message is too long, we will shorten it...", LogLevel.INFO)
+        response = requests.post(f"{AC_OLLAMA_URL}/api/chat", json={
+            "model": AC_OLLAMA_MODEL, 
+            "messages": [
+                {"role": "system", "content": regenerate_system_prompt()},
+                {"role": "user", "content": response_message}
+            ],
+            "stream": False
+        })
+        response_json = response.json()
+        response_message = response_json["message"]["content"]
+        response_message = response_message.replace("```", "")
+
 
     log(f"Response message: {response_message}", LogLevel.VERBOSE)
     log("Done!\n", LogLevel.INFO)
