@@ -29,8 +29,8 @@ def git_status():
     result = subprocess.run(['git', 'status', '--short'], capture_output=True, text=True)
     return result.returncode, result.stdout
 
-def git_commit(message):
-    result = subprocess.run(['git', 'commit', '-m', message], capture_output=True, text=True)
+def git_commit(message, *argv):
+    result = subprocess.run(['git', 'commit', *argv, '-m', message], capture_output=True, text=True)
     return result.returncode, result.stdout
 
 def system_prompt():
@@ -212,7 +212,10 @@ if __name__ == "__main__":
     commit_message = commit_message.strip()
     log(f"Commit message: {commit_message}", LogLevel.INFO)
     log("Now commit to git...", LogLevel.INFO)
-    return_code, _ = git_commit(commit_message)
+    if args.amend:
+        return_code, _ = git_commit(commit_message, '--amend')
+    else:
+        return_code, _ = git_commit(commit_message)
     if return_code != 0:
         log("Failed to commit", LogLevel.ERROR)
         sys.exit(1)
