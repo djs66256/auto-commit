@@ -3,6 +3,7 @@ import sys
 import os
 import argparse
 import requests
+from provider import get_provider, get_settings
 
 class LogLevel:
     DEBUG = 0
@@ -98,20 +99,114 @@ def log(message, level=LogLevel.INFO):
     if level >= default_log_level:
         print(f"{message}")
 
+
+class APIProvider:
+    def generate_message(self, user_input: str, files: str, diff: str, last_diff: str) -> str:
+        pass
+
+    def summarize(self, user_input: str, files: str, diff: str, last_diff: str, long_message: str) -> str:
+        pass
+
+    def default_generate_prompt(self, user_input: str, files: str, diff: str, last_diff: str) -> str:
+        return f'''
+        User message:
+        {user_input or ""}
+        Files:
+        {files}
+        Diff:
+        {diff or ""}
+        {last_diff or ""}
+        '''
+
+class OllamaProvider(APIProvider):
+    AC_OLLAMA_URL = os.getenv("AC_OLLAMA_URL", "http://localhost:11434")
+    AC_OLLAMA_MODEL = os.getenv("AC_OLLAMA_MODEL", "qwen2.5-coder:7b")
+
+    def generate_message(self, user_input: str, files: str, diff: str, last_diff: str) -> str:
+        response = requests.post(f"{self.AC_OLLAMA_URL}/api/chat", json={
+            "model": self.AC_OLLAMA_MODEL, 
+            "messages": [
+                {"role": "system", "content": system_prompt()},
+                {"role": "user", "content": user_content}
+            ],
+            "stream": False
+        })
+        return response.json()["message"]["content"].replace("```", "")
+    
+    def summarize(self, user_input, files, diff, last_diff, long_message):
+        response = requests.post(f"{self.AC_OLLAMA_URL}/api/chat", json={
+            "model": self.AC_OLLAMA_MODEL, 
+            "messages": [
+                {"role": "system", "content": regenerate_system_prompt()},
+                {"role": "user", "content": response_message}
+            ],
+            "stream": False
+        })
+        response_json = response.json()
+        response_message = response_json["message"]["content"]
+        response_message = response_message.replace("```", "")
+        return response_message
+
+class ChatGLMProvider(APIProvider):
+    API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+    API_TOKEN = os.getenv("AC_CHATGLM_API_TOKEN") 
+    MODEL = os.getenv("AC_CHATGLM_MODEL", "glm-4-flash")
+
+    def generate_message(self, user_input: str, files: str, diff: str, last_diff: str) -> str:
+        print(f"{files} {diff} {last_diff}")
+        user_content = self.default_generate_prompt(user_input, files, diff, last_diff)
+        print(user_content)
+        response = requests.post(
+            self.API_URL, 
+            headers={
+                "Authorization": f"Bearer {self.API_TOKEN}"
+            }, 
+            json={
+                "model": self.MODEL,
+                "messages": [
+                    {"role": "system", "content": system_prompt()},
+                    {"role": "user", "content": user_content}
+                ],
+                "stream": False
+            })
+        print(response.json())
+        return response.json()["message"]["content"].replace("```", "")
+
+    def summarize(self, user_input, files, diff, last_diff, long_message):
+        response = requests.post(
+            self.API_URL, 
+            headers={
+                "Authorization": f"Bearer {self.API_TOKEN}"
+            }, 
+            json={
+                "model": self.MODEL, 
+                "messages": [
+                    {"role": "system", "content": regenerate_system_prompt()},
+                    {"role": "user", "content": response_message}
+                ],
+                "stream": False
+            })
+        return response.json()["message"]["content"].replace("```", "")
+
+
+PROVIDERS = {
+    "ollama": OllamaProvider(),
+    "chatglm": ChatGLMProvider(),
+}
+
+
 # args: 
 # -m commit: message
 # -a add: add all files to git
 # -v --verbose: log level, default is INFO
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AI assistant for git commit")
+    parser.add_argument("-p", "--provider", help="The chat api provider name")
     parser.add_argument("-m", "--message", required=False, help="The commit message")
     parser.add_argument("-a", "--add", action="store_true", help="Add all files to git")
     parser.add_argument("--amend", action="store_true", help="Amend the last commit")
     parser.add_argument("-v", "--verbose", action="store_true", help="Log level, default is INFO")
     args = parser.parse_args()
-
-    AC_OLLAMA_URL = os.getenv("AC_OLLAMA_URL", "http://localhost:11434")
-    AC_OLLAMA_MODEL = os.getenv("AC_OLLAMA_MODEL", "qwen2.5-coder:7b")
 
     if args.verbose:
         default_log_level = LogLevel.DEBUG
@@ -160,49 +255,29 @@ if __name__ == "__main__":
         else:
             log(f"Last diff message: {last_diff_message}", LogLevel.DEBUG)
 
-    user_content = f'''
-    User message:
-    {message or ""}
-    Files:
-    {files}
-    Diff:
-    {diff_message or ""}
-    {last_diff_message or ""}
-    '''
+    settings = get_settings()
+    provider_name = args.provider or settings.get("provider") or "ollama"
+    provider = get_provider(provider_name)
+    if provider is None:
+        log(f"LLM provider {provider_name} not found", LogLevel.ERROR)
+        sys.exit(1)
 
-    # use ollama to generate the commit message
-    log("Now we will generate the commit message using ollama...", LogLevel.INFO)
-    response = requests.post(f"{AC_OLLAMA_URL}/api/chat", json={
-        "model": AC_OLLAMA_MODEL, 
-        "messages": [
-            {"role": "system", "content": system_prompt()},
-            {"role": "user", "content": user_content}
-        ],
-        "stream": False
-    })
-
-    response_json = response.json()
-    response_message = response_json["message"]["content"]
-    response_message = response_message.replace("```", "")
-
-    # If message is too long, re-generate it and make it shorter.
-    if len(response_message) > 200:
-        log(f"Response message: {response_message}", LogLevel.VERBOSE)
-        log("Message is too long, we will shorten it...", LogLevel.INFO)
-        response = requests.post(f"{AC_OLLAMA_URL}/api/chat", json={
-            "model": AC_OLLAMA_MODEL, 
-            "messages": [
-                {"role": "system", "content": regenerate_system_prompt()},
-                {"role": "user", "content": response_message}
-            ],
-            "stream": False
-        })
-        response_json = response.json()
-        response_message = response_json["message"]["content"]
-        response_message = response_message.replace("```", "")
-
-
+    log(f"Now we will generate the commit message using {provider_name}...", LogLevel.INFO)
+    response_message = provider.generate_message(
+        user_input = message,
+        files = files, 
+        diff = diff_message, 
+        last_diff = last_diff_message)
     log(f"Response message: {response_message}", LogLevel.VERBOSE)
+    if len(response_message) > 200:
+        log("Message is too long, we will shorten it...", LogLevel.INFO)
+        response_message = provider.summarize(
+            user_input = message, 
+            files = files, diff = diff_message, 
+            last_diff = last_diff_message,
+            long_message=response_message)
+        log(f"Response message: {response_message}", LogLevel.VERBOSE)
+
     log("Done!\n", LogLevel.INFO)
 
     if message is not None and len(message) > 0:
@@ -210,8 +285,9 @@ if __name__ == "__main__":
     else:
         commit_message = response_message
     commit_message = commit_message.strip()
-    log(f"Commit message: {commit_message}", LogLevel.INFO)
+    log(f"Commit message: \n{commit_message}\n", LogLevel.INFO)
     log("Now commit to git...", LogLevel.INFO)
+    
     if args.amend:
         return_code, _ = git_commit(commit_message, '--amend')
     else:
@@ -221,3 +297,4 @@ if __name__ == "__main__":
         sys.exit(1)
     log("Done!\n", LogLevel.INFO)
     log("Thank you for using AI assistant for git commit!", LogLevel.INFO)
+

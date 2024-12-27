@@ -1,0 +1,81 @@
+settings:
+  provider: ollama
+
+base:
+  base_url: ""
+  api_key: ""
+  api_type: openai
+  generate_prompt:
+    "
+    {% if user_input %}
+    ## User input:
+    {{user_input}}
+    {% endif %}
+
+    ## Modified files:
+    {{files}}
+
+    {% if diff %}
+    ## Diff message:
+    {{diff}}
+    {% endif %}
+
+    {% if last_diff %}
+    ## Diff message:
+    {{last_diff}}
+    {% endif %}
+
+    ---
+    请根据上面的内容，生成一段 git 提交日志，字数控制在 50 字以内。
+    提交日志应该满足以下要求：
+    - 简洁明了，不要冗余，描述清楚功能修改及其目的
+    - 始终使用中文
+    - 使用现在时
+    - 使用祈使语气
+    - 使用特定的 commit 类型开头，保持提交信息头部简洁，不要带上任何文件名等其他信息
+        - 使用 `feat:` 开头表示功能修改，大部分情况应该使用这个类型，除非明确的下面几种类型
+        - 使用 `fix:` 开头表示 bug 等问题修复
+        - 使用 `optimize:` 开头表示性能优化
+        - 使用 `docs:` 开头表示文档相关
+    ## Example
+    ```
+    feat: {添加了某个功能}
+    fix: {修复了某个 bug}
+    optimize: {优化了某个性能}
+    docs: {更新了某个文档}
+    ```
+    "
+
+  summarize_prompt:
+    "
+    {{long_message}}
+
+    ---
+    请根据上面的修改内容描述，生成一段 git 提交日志，字数控制在 50 字以内。
+    提交日志应该满足以下要求：
+    - 简洁明了，不要冗余，描述清楚功能修改及其目的
+    - 始终使用中文
+    - 使用现在时
+    - 使用祈使语气
+    - 使用特定的 commit 类型开头，保持提交信息头部简洁，不要带上任何文件名等其他信息
+        - 使用 `feat:` 开头表示功能修改，大部分情况应该使用这个类型，除非明确的下面几种类型
+        - 使用 `fix:` 开头表示 bug 等问题修复
+        - 使用 `optimize:` 开头表示性能优化
+        - 使用 `docs:` 开头表示文档相关
+    ## Example
+    ```
+    feat: {添加了某个功能}
+    fix: {修复了某个 bug}
+    optimize: {优化了某个性能}
+    docs: {更新了某个文档}
+    "
+  
+ollama:
+  base_url: http://localhost:11434/v1
+  api_key: ollama
+  model: qwen2.5-coder:7b
+
+chatglm:
+  base_url: https://open.bigmodel.cn/api/paas/v4/
+  api_key: ""
+  model: glm-4-flash
