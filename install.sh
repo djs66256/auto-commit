@@ -36,7 +36,7 @@ else
     fi
 fi
 
-echo "alias gca='python3 ~/auto-commit/commit.sh -a'" >> $bashrc_path
+echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> $bashrc_path
 
 source $bashrc_path
 
