@@ -1,8 +1,7 @@
 import subprocess
 import sys
-import os
 import argparse
-import requests
+
 from provider import get_provider, get_settings
 
 class LogLevel:
