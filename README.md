@@ -81,7 +81,7 @@ You can add alias to bashrc:
 
 You can customize by editing the file at `~/.auto_commit/config.yaml`
 
-## Prompt and language
+### Prompt and language
 
 You can modify the prompt and language by editing the file at `~/.auto_commit/config.yaml`, default language is Chinese.
 

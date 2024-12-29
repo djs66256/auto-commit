@@ -1,7 +1,7 @@
 # python requirements
 
-requests==2.31.0
-jinja2==3.1.2
-openai==1.58.1
-socksio==1.0.0
-pyyaml==6.0.2
+requests>=2.31
+jinja2>=3.1.2
+openai>=1.58.1
+socksio>=1.0.0
+pyyaml>=6.0.2

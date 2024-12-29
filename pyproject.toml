@@ -1,0 +1,4 @@
+[tool.poetry]
+name = 'auto-commit'
+version = '0.1.0'
+python = '^3.10'
