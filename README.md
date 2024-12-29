@@ -50,7 +50,7 @@ sh install.sh -h
 Usage:  [-p provider] [-t token] -s -h
   -p provider: llm provider name, ollama/chatglm/deepseek
   -t token: api_key, you need an api_key to access the provider
-  -s add alias gca to bashrc
+  -s add alias 'gca=python commit.py -a' to bashrc
   -h help
 ```
 
