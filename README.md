@@ -56,6 +56,16 @@ Usage:  [-p provider] [-t token] -s -h
 
 `sh install.sh` will use Ollama as the default provider.
 
+### Alias
+
+Recommend to add alias to your bashrc file. Or add alias to your gitconfig file.
+
+```bash
+You can add alias to bashrc:
+  echo "alias gca=python3 /Users/daniel/auto-commit/commit.py -a" >> ~.bashrc
+  source ~/.bashrc
+```
+
 ## Customize
 
 You can customize by editing the file at `~/.auto_commit/config.yaml`
