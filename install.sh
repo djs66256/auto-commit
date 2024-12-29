@@ -16,7 +16,7 @@ usage() {
 }
 
 # 解析参数
-while getopts "p:t:h" opt; do
+while getopts "p:t:sh" opt; do
     case $opt in
         p) provider="$OPTARG"
            ;;
@@ -55,7 +55,14 @@ cd auto-commit
 pip3 install --upgrade -r requirements.txt
 
 echo "Setup config..."
-echo "settings:\n  provider: ${provider}\n\n${provider}:\n  api_key: ${token}\n" > ~/.auto-commit/config.yaml
+if [ ! -d ~/.auto-commit ]; then
+    mkdir ~/.auto-commit
+fi
+
+echo "settings:" > ~/.auto-commit/config.yml
+echo "  provider: ${provider}" >> ~/.auto-commit/config.yml
+echo "${provider}:" >> ~/.auto-commit/config.yml
+echo "  api_key: ${token}" >> ~/.auto-commit/config.yml
 
 if [ $add_alias == true ]; then
 echo "Setup alias..."
@@ -77,7 +84,9 @@ echo "Setup alias..."
 
     source $bashrc_path
 else
-    echo 'You can add alias to bashrc:\n  echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> ~.bashrc\n  source ~/.bashrc'
+    echo 'You can add alias to bashrc:'
+    echo '  echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> ~.bashrc'
+    echo '  source ~/.bashrc'
 fi
 
 echo "DONE!"
