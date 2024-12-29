@@ -10,7 +10,7 @@ usage() {
     echo "Usage:  [-p provider] [-t token] -s -h"
     echo "  -p provider: llm provider name, ollama/chatglm/deepseek"
     echo "  -t token: api_key, you need an api_key to access the provider"
-    echo "  -s add alias gca to bashrc"
+    echo "  -s add alias 'gca=python commit.py -a' to bashrc"
     echo "  -h help"
     exit 0
 }
