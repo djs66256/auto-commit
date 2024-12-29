@@ -56,6 +56,17 @@ Usage:  [-p provider] [-t token] -s -h
 
 `sh install.sh` will use Ollama as the default provider.
 
+Or just simple:
+
+```bash
+# use local ollama
+bash <(curl https://raw.githubusercontent.com/djs66256/auto-commit/refs/heads/master/install.sh) -s
+```
+```bash
+# use api service of chatglm
+bash <(curl https://raw.githubusercontent.com/djs66256/auto-commit/refs/heads/master/install.sh) -p chatglm -t {your_api_key} -s
+```
+
 ### Alias
 
 Recommend to add alias to your bashrc file. Or add alias to your gitconfig file.
