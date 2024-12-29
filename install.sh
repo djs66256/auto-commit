@@ -76,6 +76,8 @@ echo "Setup alias..."
     echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> $bashrc_path
 
     source $bashrc_path
+else
+    echo 'You can add alias to bashrc:\n  echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> ~.bashrc\n  source ~/.bashrc'
 fi
 
 echo "DONE!"

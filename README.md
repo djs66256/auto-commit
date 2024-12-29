@@ -2,34 +2,36 @@
 
 Auto commit is a AI assistant that helps you to commit your changes to git.
 
-Using Ollama to generate the commit message.
-
-## Install
-
-1. Install Ollama
-2. `ollama pull qwen2.5-coder:7b`
-3. `pip install -r requirements.txt`
-
-## Customize
-
-```
-export AC_OLLAMA_URL='http://your.ollama.server.url'
-export AC_OLLAMA_MODEL='your.ollama.model.name'
-```
-
-Add to bashrc is recommended.
-
-```
-echo 'export AC_OLLAMA_URL=http://your.ollama.server.url' >> ~/.bashrc
-source ~/.bashrc
-```
-
-> In macos, it maybe .bash_profile or .zshrc, depend on your terminal.
+Using LLM to generate the commit message.
  
 ## Usage
 
+You can check the usage by:
+```
+python commit.py -h
+```
 ```bash
-python commit.py -a -m "Your additional commit message"
+usage: commit.py [-h] [-p PROVIDER] [-m MESSAGE] [-a] [--amend] [-v]
+
+AI assistant for git commit
+
+options:
+  -h, --help            show this help message and exit
+  -p PROVIDER, --provider PROVIDER
+                        The chat api provider name
+  -m MESSAGE, --message MESSAGE
+                        The commit message
+  -a, --add             Add all files to git
+  --amend               Amend the last commit
+  -v, --verbose         Log level, default is INFO
+```
+
+### Examples
+
+Add all files and comit with all files:
+
+```bash
+python commit.py -a
 ```
 
 If you don't like the message, you can re-generate by:
@@ -37,3 +39,23 @@ If you don't like the message, you can re-generate by:
 ```bash
 python commit.py -a --amend
 ```
+## Install
+
+You can check the usage of install.sh by:
+```
+sh install.sh -h 
+```
+
+```bash
+Usage:  [-p provider] [-t token] -s -h
+  -p provider: llm provider name, ollama/chatglm/deepseek
+  -t token: api_key, you need an api_key to access the provider
+  -s add alias gca to bashrc
+  -h help
+```
+
+`sh install.sh` will use Ollama as the default provider.
+
+## Customize
+
+You can customize by editing the file at `~/.auto_commit/config.yaml`
