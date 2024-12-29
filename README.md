@@ -69,3 +69,13 @@ You can add alias to bashrc:
 ## Customize
 
 You can customize by editing the file at `~/.auto_commit/config.yaml`
+
+## Prompt and language
+
+You can modify the prompt and language by editing the file at `~/.auto_commit/config.yaml`, default language is Chinese.
+
+```yml
+base:
+    generate_prompt: {prompt to generate commit message}
+    summarize_prompt: {when the result of generate_prompt is too long for some reason, summarize it by this prompt}
+```
