@@ -43,23 +43,25 @@ else
     git clone https://github.com/djs66256/auto-commit.git
 fi
 
-if pip3 install -q --upgrade pip; then
-    echo "Pip3 is installed."
+echo "Upgrade pip..."
+
+if pip install -q --upgrade pip; then
+    echo "Pip is installed."
 else
-    echo "Pip3 is not installed."
+    echo "Pip is not installed."
     exit 1
 fi
 
-if python3 -m pip install --upgrade pip; then
-    echo "Python3 is installed."
+if python -m pip install --upgrade pip; then
+    echo "Python is installed."
 else
-    echo "Python3 is not installed."
+    echo "Python is not installed."
     exit 1
 fi
 
 echo "Install requirements..."
 cd auto-commit
-pip3 install --upgrade -r requirements.txt
+pip install --upgrade -r requirements.txt
 
 echo "Setup config..."
 if [ ! -d ~/.auto-commit ]; then
@@ -87,12 +89,12 @@ echo "Setup alias..."
         fi
     fi
 
-    echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> $bashrc_path
+    echo "alias gca='python ~/auto-commit/commit.py -a'" >> $bashrc_path
 
     source $bashrc_path
 else
     echo 'You can add alias to bashrc:'
-    echo '  echo "alias gca='python3 ~/auto-commit/commit.py -a'" >> ~.bashrc'
+    echo "  echo "alias gca=\'python ~/auto-commit/commit.py -a\'" >> ~.bashrc"
     echo '  source ~/.bashrc'
 fi
 
