@@ -34,7 +34,14 @@ done
 cd ~
 
 echo "Download auto-commit..."
-git clone https://github.com/djs66256/auto-commit.git
+
+if [ -d ~/auto-commit ]; then
+    cd auto-commit
+    git pull --rebase
+    cd ..
+else
+    git clone https://github.com/djs66256/auto-commit.git
+fi
 
 if pip3 install -q --upgrade pip; then
     echo "Pip3 is installed."
