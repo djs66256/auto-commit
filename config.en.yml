@@ -21,17 +21,9 @@ base:
     {% endif %}
 
     ---
-    Please generate a git commit message based on the above content, keeping it within 50 words.
-    The commit message should meet the following requirements:
-    - Concise and clear, no redundancy, describe the functionality changes and their purpose
-    - Always in English
-    - Use present tense
-    - Use imperative mood
-    - Start with specific commit types, keep the commit header concise without any filenames or other information
-        - Start with `feat:` for feature changes (use this type in most cases unless it clearly fits the types below)
-        - Start with `fix:` for bug fixes and issue resolutions
-        - Start with `optimize:` for performance optimizations
-        - Start with `docs:` for documentation-related changes
+    Please generate a git commit message based on the infomation above, keeping it within 50 words.
+    Always in English
+    
     ## Example
     ```
     feat: {add new functionality}
@@ -46,17 +38,9 @@ base:
     {{long_message}}
 
     ---
-    Please generate a git commit message based on the changes above, keeping it within 50 words.
-    The commit message should meet the following requirements:
-    - Concise and clear, no redundancy, describe the functionality changes and their purpose
-    - Always in English
-    - Use present tense
-    - Use imperative mood
-    - Start with specific commit types, keep the commit header concise without any filenames or other information
-        - Start with `feat:` for feature changes (use this type in most cases unless it clearly fits the types below)
-        - Start with `fix:` for bug fixes and issue resolutions
-        - Start with `optimize:` for performance optimizations
-        - Start with `docs:` for documentation-related changes
+    Please generate a git commit message based on the infomation above, keeping it within 50 words.
+    Always in English
+
     ## Example
     ```
     feat: {add new functionality}
