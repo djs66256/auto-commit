@@ -9,8 +9,8 @@ PROVIDERS: dict[str, APIProvider] = {
 
 glable_config = GlobalConfig()
 
-def get_provider(provider_name: str) -> APIProvider:
-    config = glable_config.getConfig(provider_name)
+def get_provider(provider_name: str, ex_config: str) -> APIProvider:
+    config = glable_config.getConfig(provider_name, ex_config)
     # print("========")
     # print(config.config)
     # print("========")

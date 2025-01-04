@@ -28,12 +28,22 @@ class GlobalConfig:
         else:
             self.user_config = {}
 
-    def getConfig(self, provider):
+    def getExConfig(self, ex_config):
+        path = f"{os.path.dirname(__file__)}/../config.{ex_config}.yml"
+        if os.path.exists(path):
+            with open(path) as f:
+                return yaml.load(f, Loader=yaml.FullLoader)
+        return None
+    
+    def getConfig(self, provider, ex_config = None):
         base_user_config = self.user_config.get("base") or {}
         base_default_config = self.default_config.get("base") or {}
+        base_ex_config = {}
+        if ex_config:
+            base_ex_config = self.getExConfig(ex_config) or {}
         user_config = self.user_config.get(provider) or {}
         default_config = self.default_config.get(provider) or {}
-        merged_config = {**base_default_config, **base_user_config, **default_config, **user_config}
+        merged_config = {**base_default_config, **base_user_config, **base_ex_config, **default_config, **user_config}
         return ProviderConfig(provider, merged_config)
 
 if __name__ == "__main__":

@@ -46,6 +46,8 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--message", required=False, help="The commit message")
     parser.add_argument("-a", "--add", action="store_true", help="Add all files to git")
     parser.add_argument("--amend", action="store_true", help="Amend the last commit")
+    parser.add_argument("-c", "--config", required=False, help="The external config. 'en'")
+    parser.add_argument("-d", "--dry", action="store_true", help="Dry run, only print the commit message")
     parser.add_argument("-v", "--verbose", action="store_true", help="Log level, default is INFO")
     args = parser.parse_args()
 
@@ -53,6 +55,8 @@ if __name__ == "__main__":
         default_log_level = LogLevel.DEBUG
     else:
         default_log_level = LogLevel.INFO
+
+    ex_config = args.config
 
     message = args.message
     log(f"Your commit message: {message}", LogLevel.VERBOSE)
@@ -98,7 +102,7 @@ if __name__ == "__main__":
 
     settings = get_settings()
     provider_name = args.provider or settings.get("provider") or "ollama"
-    provider = get_provider(provider_name)
+    provider = get_provider(provider_name, ex_config)
     if provider is None:
         log(f"LLM provider {provider_name} not found", LogLevel.ERROR)
         sys.exit(1)
@@ -127,15 +131,17 @@ if __name__ == "__main__":
         commit_message = response_message
     commit_message = commit_message.strip()
     log(f"Commit message: \n{commit_message}\n", LogLevel.INFO)
-    log("Now commit to git...", LogLevel.INFO)
     
-    if args.amend:
-        return_code, _ = git_commit(commit_message, '--amend')
-    else:
-        return_code, _ = git_commit(commit_message)
-    if return_code != 0:
-        log("Failed to commit", LogLevel.ERROR)
-        sys.exit(1)
-    log("Done!\n", LogLevel.INFO)
+    if not args.dry:
+        log("Now commit to git...", LogLevel.INFO)
+        if args.amend:
+            return_code, _ = git_commit(commit_message, '--amend')
+        else:
+            return_code, _ = git_commit(commit_message)
+        if return_code != 0:
+            log("Failed to commit", LogLevel.ERROR)
+            sys.exit(1)
+        log("Done!\n", LogLevel.INFO)
+        
     log("Thank you for using AI assistant for git commit!", LogLevel.INFO)
 
