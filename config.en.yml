@@ -21,23 +21,23 @@ base:
     {% endif %}
 
     ---
-    请根据上面的内容，生成一段 git 提交日志，字数控制在 50 字以内。
-    提交日志应该满足以下要求：
-    - 简洁明了，不要冗余，描述清楚功能修改及其目的
+    Please generate a git commit message based on the above content, keeping it within 50 words.
+    The commit message should meet the following requirements:
+    - Concise and clear, no redundancy, describe the functionality changes and their purpose
     - Always in English
-    - 使用现在时
-    - 使用祈使语气
-    - 使用特定的 commit 类型开头，保持提交信息头部简洁，不要带上任何文件名等其他信息
-        - 使用 `feat:` 开头表示功能修改，大部分情况应该使用这个类型，除非明确的下面几种类型
-        - 使用 `fix:` 开头表示 bug 等问题修复
-        - 使用 `optimize:` 开头表示性能优化
-        - 使用 `docs:` 开头表示文档相关
+    - Use present tense
+    - Use imperative mood
+    - Start with specific commit types, keep the commit header concise without any filenames or other information
+        - Start with `feat:` for feature changes (use this type in most cases unless it clearly fits the types below)
+        - Start with `fix:` for bug fixes and issue resolutions
+        - Start with `optimize:` for performance optimizations
+        - Start with `docs:` for documentation-related changes
     ## Example
     ```
-    feat: {添加了某个功能}
-    fix: {修复了某个 bug}
-    optimize: {优化了某个性能}
-    docs: {更新了某个文档}
+    feat: {add new functionality}
+    fix: {resolve specific bug}
+    optimize: {improve performance}
+    docs: {update documentation}
     ```
     "
 
@@ -46,21 +46,21 @@ base:
     {{long_message}}
 
     ---
-    请根据上面的修改内容描述，生成一段 git 提交日志，字数控制在 50 字以内。
-    提交日志应该满足以下要求：
-    - 简洁明了，不要冗余，描述清楚功能修改及其目的
+    Please generate a git commit message based on the changes above, keeping it within 50 words.
+    The commit message should meet the following requirements:
+    - Concise and clear, no redundancy, describe the functionality changes and their purpose
     - Always in English
-    - 使用现在时
-    - 使用祈使语气
-    - 使用特定的 commit 类型开头，保持提交信息头部简洁，不要带上任何文件名等其他信息
-        - 使用 `feat:` 开头表示功能修改，大部分情况应该使用这个类型，除非明确的下面几种类型
-        - 使用 `fix:` 开头表示 bug 等问题修复
-        - 使用 `optimize:` 开头表示性能优化
-        - 使用 `docs:` 开头表示文档相关
+    - Use present tense
+    - Use imperative mood
+    - Start with specific commit types, keep the commit header concise without any filenames or other information
+        - Start with `feat:` for feature changes (use this type in most cases unless it clearly fits the types below)
+        - Start with `fix:` for bug fixes and issue resolutions
+        - Start with `optimize:` for performance optimizations
+        - Start with `docs:` for documentation-related changes
     ## Example
     ```
-    feat: {添加了某个功能}
-    fix: {修复了某个 bug}
-    optimize: {优化了某个性能}
-    docs: {更新了某个文档}
+    feat: {add new functionality}
+    fix: {resolve specific bug}
+    optimize: {improve performance}
+    docs: {update documentation}
     "
