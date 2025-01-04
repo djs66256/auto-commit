@@ -45,6 +45,13 @@ fi
 
 echo "Upgrade pip..."
 
+# MUST use python3
+if command -v python3 &> /dev/null; then
+    python=python3
+else
+    python=python
+fi
+
 if pip install -q --upgrade pip; then
     echo "Pip is installed."
 else
