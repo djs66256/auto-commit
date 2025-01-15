@@ -35,11 +35,11 @@ def git_commit(message, *argv):
 
 def git_pull():
     result = subprocess.run(['git', 'pull', '--rebase'], capture_output=True, text=True)
-    return result.returncode, result.stdout
+    return result.returncode, result.stdout, result.stderr
 
 def git_push():
     result = subprocess.run(['git', 'push'], capture_output=True, text=True)
-    return result.returncode, result.stdout
+    return result.returncode, result.stdout, result.stderr
 
 def log(message, level=LogLevel.INFO):
     if level >= default_log_level:
@@ -155,17 +155,18 @@ if __name__ == "__main__":
 
         if args.sync:
             log("Now we will pull from remote repo...", LogLevel.INFO)
-            return_code, _ = git_pull()
+            return_code, stdout, stderr = git_pull()
             if return_code != 0:
-                log("Failed to pull", LogLevel.ERROR)
+                log(f"Failed to pull:\n{stderr}", LogLevel.ERROR)
                 sys.exit(1)
-                
+            log(f"{stdout}\nDone!\n", LogLevel.INFO)
+
             log("Now we will push to remote repo...", LogLevel.INFO)
-            return_code, _ = git_push()
+            return_code, stdout, stderr = git_push()
             if return_code != 0:
-                log("Failed to push", LogLevel.ERROR)
+                log(f"Failed to push:\n{stderr}", LogLevel.ERROR)
                 sys.exit(1)
-            log("Done!\n", LogLevel.INFO)
+            log(f"{stdout}\nDone!\n", LogLevel.INFO)
         
     log("Thank you for using AI assistant for git commit!", LogLevel.INFO)
 
