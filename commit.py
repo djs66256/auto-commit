@@ -33,6 +33,10 @@ def git_commit(message, *argv):
     result = subprocess.run(['git', 'commit', *argv, '-m', message], capture_output=True, text=True)
     return result.returncode, result.stdout
 
+def git_pull():
+    result = subprocess.run(['git', 'pull', '--rebase'], capture_output=True, text=True)
+    return result.returncode, result.stdout
+
 def git_push():
     result = subprocess.run(['git', 'push'], capture_output=True, text=True)
     return result.returncode, result.stdout
@@ -150,6 +154,12 @@ if __name__ == "__main__":
         log("Done!\n", LogLevel.INFO)
 
         if args.sync:
+            log("Now we will pull from remote repo...", LogLevel.INFO)
+            return_code, _ = git_pull()
+            if return_code != 0:
+                log("Failed to pull", LogLevel.ERROR)
+                sys.exit(1)
+                
             log("Now we will push to remote repo...", LogLevel.INFO)
             return_code, _ = git_push()
             if return_code != 0:
