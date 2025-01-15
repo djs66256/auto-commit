@@ -32,6 +32,11 @@ def git_status():
 def git_commit(message, *argv):
     result = subprocess.run(['git', 'commit', *argv, '-m', message], capture_output=True, text=True)
     return result.returncode, result.stdout
+
+def git_push():
+    result = subprocess.run(['git', 'push'], capture_output=True, text=True)
+    return result.returncode, result.stdout
+
 def log(message, level=LogLevel.INFO):
     if level >= default_log_level:
         print(f"{message}")
@@ -46,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--message", required=False, help="The commit message")
     parser.add_argument("-a", "--add", action="store_true", help="Add all files to git")
     parser.add_argument("--amend", action="store_true", help="Amend the last commit")
+    parser.add_argument("-s", "--sync", action="store_true", help="Push to remote repo")
     parser.add_argument("-c", "--config", required=False, help="The external config. 'en'")
     parser.add_argument("-d", "--dry", action="store_true", help="Dry run, only print the commit message")
     parser.add_argument("-v", "--verbose", action="store_true", help="Log level, default is INFO")
@@ -142,6 +148,14 @@ if __name__ == "__main__":
             log("Failed to commit", LogLevel.ERROR)
             sys.exit(1)
         log("Done!\n", LogLevel.INFO)
+
+        if args.sync:
+            log("Now we will push to remote repo...", LogLevel.INFO)
+            return_code, _ = git_push()
+            if return_code != 0:
+                log("Failed to push", LogLevel.ERROR)
+                sys.exit(1)
+            log("Done!\n", LogLevel.INFO)
         
     log("Thank you for using AI assistant for git commit!", LogLevel.INFO)
 
